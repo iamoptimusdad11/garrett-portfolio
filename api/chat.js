@@ -15,19 +15,27 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          {
-            role: "system",
-            content: "You are RocketBot, an expert in rockets, propulsion, avionics, astrophysics, and orbital mechanics."
-          },
+          { role: "system", content: "You are a rocket science expert." },
           { role: "user", content: message }
         ]
       }),
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({
+        reply: "OpenAI error",
+        details: data
+      });
+    }
+
     res.status(200).json({ reply: data.choices[0].message.content });
 
-  } catch (err) {
-    res.status(500).json({ reply: "RocketBot encountered an error." });
+  } catch (error) {
+    res.status(500).json({
+      reply: "Server error",
+      details: error.message
+    });
   }
 }
